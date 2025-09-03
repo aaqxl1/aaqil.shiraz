@@ -887,25 +887,29 @@ section {
 
 /* Project Logo Mini - For All Projects Section */
 .project-logo-mini {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    position: relative;
-    transition: all 0.3s ease;
+    width: 48px !important;
+    height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    transition: all 0.3s ease !important;
+    background: transparent !important;
+    border: none !important;
 }
 
 .project-card:hover .project-logo-mini {
-    transform: scale(1.1);
+    transform: scale(1.1) !important;
 }
 
 /* Slack Celebration Bot Logo */
 .slack-logo .slack-icon {
-    position: relative;
-    width: 32px;
-    height: 32px;
+    position: relative !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: block !important;
+    visibility: visible !important;
 }
 
 .slack-logo .slack-hash {
@@ -916,9 +920,11 @@ section {
 }
 
 .slack-logo .hash-line {
-    background: linear-gradient(45deg, #4a154b, #611f69);
-    border-radius: 2px;
-    position: absolute;
+    background: linear-gradient(45deg, #4a154b, #611f69) !important;
+    border-radius: 2px !important;
+    position: absolute !important;
+    display: block !important;
+    visibility: visible !important;
 }
 
 .slack-logo .hash-vertical {
@@ -946,11 +952,13 @@ section {
 }
 
 .slack-logo .particle {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    animation: celebrate 2s ease-in-out infinite;
+    position: absolute !important;
+    width: 3px !important;
+    height: 3px !important;
+    border-radius: 50% !important;
+    animation: celebrate 2s ease-in-out infinite !important;
+    display: block !important;
+    visibility: visible !important;
 }
 
 .slack-logo .p1 {
@@ -2143,6 +2151,51 @@ section {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* FORCE PROJECT LOGOS TO DISPLAY - GitHub Pages Fix */
+.project-logo-mini,
+.project-logo-mini *,
+.project-logo-container,
+.project-logo-container *,
+.slack-logo,
+.slack-logo *,
+.nps-logo,
+.nps-logo *,
+.sales-logo,
+.sales-logo *,
+.co2-logo,
+.co2-logo *,
+.ml-logo,
+.ml-logo *,
+.budget-logo,
+.budget-logo *,
+.security-logo,
+.security-logo *,
+.automation-logo,
+.automation-logo * {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+}
+
+.project-logo-mini,
+.project-logo-container .project-logo {
+    display: flex !important;
+}
+
+/* Ensure animations work */
+.slack-logo .particle,
+.nps-logo .meter-needle,
+.sales-logo .grid-item,
+.sales-logo .line-segment,
+.co2-logo .cloud,
+.ml-logo .node,
+.ml-logo .flow-line,
+.budget-logo .bar,
+.security-logo .shield-body,
+.automation-logo .gear {
+    animation-play-state: running !important;
 }
 
 .hero-content,
