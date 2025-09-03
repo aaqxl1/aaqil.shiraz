@@ -534,6 +534,49 @@ function initializeDynamicSkills() {
     console.log('✨ Dynamic skills and interactions initialized!');
 }
 
+// Force project logos to display correctly
+function forceLogoDisplay() {
+    // Force mini project logos to display
+    const miniLogos = document.querySelectorAll('.project-logo-mini');
+    miniLogos.forEach(logo => {
+        logo.style.display = 'flex';
+        logo.style.visibility = 'visible';
+        logo.style.opacity = '1';
+        logo.style.position = 'relative';
+        logo.style.width = '48px';
+        logo.style.height = '48px';
+    });
+    
+    // Force featured project logos to display
+    const featuredLogos = document.querySelectorAll('.project-logo-container .project-logo');
+    featuredLogos.forEach(logo => {
+        logo.style.display = 'flex';
+        logo.style.visibility = 'visible';
+        logo.style.opacity = '1';
+        logo.style.position = 'relative';
+    });
+    
+    // Force all logo icons to display
+    const allIcons = document.querySelectorAll('[class*="-icon"], [class*="-logo"]');
+    allIcons.forEach(icon => {
+        if (icon.style.display !== 'none') {
+            icon.style.visibility = 'visible';
+            icon.style.opacity = '1';
+        }
+    });
+    
+    console.log(`🎨 Forced display of ${miniLogos.length + featuredLogos.length} project logos`);
+}
+
+// Initialize logo display when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    forceLogoDisplay(); // Force project logos to show immediately
+    
+    // Double-check logos after a brief delay
+    setTimeout(forceLogoDisplay, 1000);
+    setTimeout(forceLogoDisplay, 3000);
+});
+
 // Console log for development
 console.log('🚀 Portfolio loaded successfully!');
 console.log('📧 Contact: Aaqil9365@gmail.com');
