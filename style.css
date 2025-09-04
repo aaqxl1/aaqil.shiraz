@@ -876,24 +876,30 @@ section {
 }
 
 .project-link-overlay {
-    background: #6366f1;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #6366f1, #7c3aed);
+    color: #ffffff;
+    padding: 12px 20px;
+    border-radius: 12px;
     text-decoration: none;
-    font-weight: 500;
-    display: flex;
+    font-weight: 600;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    font-size: 14px;
+    gap: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    border: none;
+    font-size: 15px;
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.35);
 }
 
 .project-link-overlay:hover {
-    background: #5046e5;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 14px 35px rgba(99, 102, 241, 0.45);
+}
+
+/* Icon spacing and size inside the button */
+.project-link-overlay i {
+    font-size: 16px;
 }
 
 /* Project Logo Mini - For All Projects Section - FIXED LAYOUT */
@@ -930,11 +936,8 @@ section {
 }
 
 /* Constrain all nested elements within mini logos */
-.project-logo-mini * {
-    max-width: 100% !important;
-    max-height: 100% !important;
-    box-sizing: border-box !important;
-}
+/* Avoid over-constraining all nested elements which broke inner absolute layouts */
+/* (intentionally left blank) */
 
 /* Fix specific layout issues for sales dashboard */
 .sales-logo .dashboard-grid {
@@ -2216,54 +2219,16 @@ section {
     }
 }
 
-/* ENHANCED PROJECT LOGOS DISPLAY - GitHub Pages Reliability Fix */
-.project-logo-mini,
-.project-logo-mini *,
-.project-logo-container,
-.project-logo-container *,
-.project-logo,
-.project-logo *,
-.slack-logo,
-.slack-logo *,
-.nps-logo,
-.nps-logo *,
-.sales-logo,
-.sales-logo *,
-.co2-logo,
-.co2-logo *,
-.ml-logo,
-.ml-logo *,
-.budget-logo,
-.budget-logo *,
-.security-logo,
-.security-logo *,
-.automation-logo,
-.automation-logo *,
-.logo-icon,
-.logo-text,
-.logo-title,
-.logo-subtitle {
-    visibility: visible !important;
-    opacity: 1 !important;
-    display: block !important;
-    position: relative !important;
-    z-index: 10 !important;
-    /* Force hardware acceleration for better rendering */
-    transform: translateZ(0) !important;
-    backface-visibility: hidden !important;
-    -webkit-transform: translateZ(0) !important;
-    -webkit-backface-visibility: hidden !important;
-    /* Ensure proper rendering */
-    will-change: auto !important;
+/* ENHANCED PROJECT LOGOS DISPLAY - minimal, non-destructive helpers */
+.project-logo-container {
+    position: relative;
 }
 
-.project-logo-mini,
-.project-logo-container,
-.project-logo-container .project-logo,
-.project-logo {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+.project-logo-container .project-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Force specific logo containers to be visible */
@@ -2274,7 +2239,7 @@ section {
     background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%) !important;
 }
 
-/* Enhanced animation reliability */
+/* Ensure animations run */
 .slack-logo .particle,
 .nps-logo .meter-needle,
 .sales-logo .grid-item,
@@ -2285,9 +2250,7 @@ section {
 .budget-logo .bar,
 .security-logo .shield-body,
 .automation-logo .gear {
-    animation-play-state: running !important;
-    animation-fill-mode: both !important;
-    animation-iteration-count: infinite !important;
+    animation-play-state: running;
 }
 
 /* Fallback styles for emergency logo display */

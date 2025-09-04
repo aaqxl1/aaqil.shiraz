@@ -575,9 +575,7 @@ function forceLogoDisplay() {
         children.forEach(child => {
             child.style.visibility = 'visible';
             child.style.opacity = '1';
-            if (child.tagName !== 'STYLE') {
-                child.style.display = child.style.display || 'block';
-            }
+            // Do NOT force display; preserve original layout (grid/absolute/flex)
         });
     });
     
@@ -615,9 +613,7 @@ function forceLogoDisplay() {
         elements.forEach(element => {
             element.style.visibility = 'visible';
             element.style.opacity = '1';
-            if (element.tagName !== 'STYLE') {
-                element.style.display = element.style.display || 'block';
-            }
+            // Preserve original display values to avoid breaking layout
         });
     });
     
@@ -638,21 +634,7 @@ function forceLogoDisplay() {
         `;
     });
     
-    // Fix specific mini logo icon containers
-    const iconContainers = document.querySelectorAll(
-        '.sales-icon, .ml-icon, .slack-icon, .nps-icon, .co2-icon'
-    );
-    iconContainers.forEach(icon => {
-        icon.style.cssText = `
-            width: 36px !important;
-            height: 36px !important;
-            position: relative !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            overflow: hidden !important;
-        `;
-    });
+    // Keep icon containers' original sizing/layout defined in CSS
     
     console.log(`🎨 FOOLPROOF logo display: ${miniLogos.length} mini + ${featuredLogos.length} featured + ${containers.length} containers`);
 }
