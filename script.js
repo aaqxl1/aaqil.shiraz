@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeScrollAnimations();
     fixLogoDisplay();
     initializeEnhancedLogos(); // Add enhanced logo initialization
+    initializeLogoHoverControls(); // Add hover control initialization
     initializeScrollProgress();
     initializeParallaxEffects();
     initializeDynamicSkills();
@@ -535,35 +536,71 @@ function initializeDynamicSkills() {
     console.log('✨ Dynamic skills and interactions initialized!');
 }
 
-// Force project logos to display correctly with enhanced reliability
+// Force project logos to display correctly with enhanced reliability - FOOLPROOF VERSION
 function forceLogoDisplay() {
-    // Force mini project logos to display
+    // Force mini project logos to display with strict constraints
     const miniLogos = document.querySelectorAll('.project-logo-mini');
     miniLogos.forEach(logo => {
-        logo.style.display = 'flex';
-        logo.style.visibility = 'visible';
-        logo.style.opacity = '1';
-        logo.style.position = 'relative';
-        logo.style.width = '48px';
-        logo.style.height = '48px';
+        logo.style.cssText = `
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: relative !important;
+            width: 48px !important;
+            height: 48px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
+            flex-shrink: 0 !important;
+        `;
     });
     
-    // Force featured project logos to display with enhanced reliability
+    // Force featured project logos to display WITHOUT overlay interference
     const featuredLogos = document.querySelectorAll('.project-logo-container .project-logo');
     featuredLogos.forEach(logo => {
-        logo.style.display = 'flex';
-        logo.style.visibility = 'visible';
-        logo.style.opacity = '1';
-        logo.style.position = 'relative';
-        logo.style.zIndex = '10';
+        logo.style.cssText = `
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: relative !important;
+            z-index: 10 !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 16px !important;
+        `;
         
-        // Ensure children are visible
+        // Ensure all children are visible
         const children = logo.querySelectorAll('*');
         children.forEach(child => {
             child.style.visibility = 'visible';
             child.style.opacity = '1';
-            child.style.display = child.style.display || 'block';
+            if (child.tagName !== 'STYLE') {
+                child.style.display = child.style.display || 'block';
+            }
         });
+    });
+    
+    // Force overlays to be properly configured (hidden by default)
+    const overlays = document.querySelectorAll('.project-overlay');
+    overlays.forEach(overlay => {
+        overlay.style.cssText = `
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: rgba(0, 0, 0, 0.85) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transition: all 0.3s ease !important;
+            z-index: 100 !important;
+            pointer-events: none !important;
+            border-radius: 12px !important;
+        `;
     });
     
     // Force all logo icons and animations to display
@@ -578,11 +615,8 @@ function forceLogoDisplay() {
         elements.forEach(element => {
             element.style.visibility = 'visible';
             element.style.opacity = '1';
-            element.style.display = element.style.display || 'block';
-            
-            // Force animations to run
-            if (element.style.animation) {
-                element.style.animationPlayState = 'running';
+            if (element.tagName !== 'STYLE') {
+                element.style.display = element.style.display || 'block';
             }
         });
     });
@@ -590,15 +624,37 @@ function forceLogoDisplay() {
     // Specifically fix featured project logo containers
     const containers = document.querySelectorAll('.project-logo-container');
     containers.forEach(container => {
-        container.style.display = 'flex';
-        container.style.alignItems = 'center';
-        container.style.justifyContent = 'center';
-        container.style.position = 'relative';
-        container.style.overflow = 'visible';
-        container.style.background = 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)';
+        container.style.cssText = `
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: relative !important;
+            width: 100% !important;
+            height: 200px !important;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%) !important;
+            border-radius: 12px !important;
+            border: 1px solid #e2e8f0 !important;
+            overflow: visible !important;
+        `;
     });
     
-    console.log(`🎨 Enhanced display of ${miniLogos.length + featuredLogos.length} project logos with ${containers.length} containers`);
+    // Fix specific mini logo icon containers
+    const iconContainers = document.querySelectorAll(
+        '.sales-icon, .ml-icon, .slack-icon, .nps-icon, .co2-icon'
+    );
+    iconContainers.forEach(icon => {
+        icon.style.cssText = `
+            width: 36px !important;
+            height: 36px !important;
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
+        `;
+    });
+    
+    console.log(`🎨 FOOLPROOF logo display: ${miniLogos.length} mini + ${featuredLogos.length} featured + ${containers.length} containers`);
 }
 
 // Enhanced logo initialization with fallback detection
@@ -651,44 +707,27 @@ function verifyLogoDisplay() {
     }
 }
 
-// Emergency fallback for logos that aren't displaying
+// Emergency fallback for logos that aren't displaying - ENHANCED
 function applyEmergencyLogoFix(logoContainer, index) {
     const logoNames = ['Budget Analytics', 'Salary Security', 'LinkedIn Automation'];
     const logoColors = ['#3b82f6', '#16a34a', '#f59e0b'];
     
     if (logoContainer && index < logoNames.length) {
+        // Only apply if logo isn't actually visible
+        const rect = logoContainer.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+            // Logo seems to be visible, just ensure it's properly displayed
+            forceLogoDisplay();
+            return;
+        }
+        
         // Clear existing content and create simple fallback
         logoContainer.innerHTML = `
-            <div style="
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 8px;
-                font-family: Inter, sans-serif;
-                color: ${logoColors[index]};
-                font-weight: 600;
-                text-align: center;
-            ">
-                <div style="
-                    width: 60px;
-                    height: 60px;
-                    background: ${logoColors[index]};
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: white;
-                    font-size: 24px;
-                    font-weight: 700;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                ">
+            <div class="emergency-logo-fallback">
+                <div class="emergency-logo-icon" style="background: ${logoColors[index]};">
                     ${logoNames[index].charAt(0)}${logoNames[index].split(' ')[1]?.charAt(0) || ''}
                 </div>
-                <div style="
-                    font-size: 12px;
-                    color: #64748b;
-                    line-height: 1.2;
-                ">
+                <div class="emergency-logo-text">
                     ${logoNames[index]}
                 </div>
             </div>
@@ -701,11 +740,36 @@ function applyEmergencyLogoFix(logoContainer, index) {
             visibility: visible !important;
             opacity: 1 !important;
             position: relative !important;
-            z-index: 10 !important;
+            z-index: 15 !important;
+            width: 100% !important;
+            height: 200px !important;
         `;
         
-        console.log(`🔧 Applied emergency fix for logo: ${logoNames[index]}`);
+        console.log(`🔧 Applied emergency fallback for logo: ${logoNames[index]}`);
     }
+}
+
+// Add logo hover event handlers for better overlay control
+function initializeLogoHoverControls() {
+    const containers = document.querySelectorAll('.project-logo-container');
+    containers.forEach(container => {
+        const overlay = container.querySelector('.project-overlay');
+        if (overlay) {
+            container.addEventListener('mouseenter', () => {
+                overlay.style.opacity = '1';
+                overlay.style.visibility = 'visible';
+                overlay.style.pointerEvents = 'auto';
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                overlay.style.opacity = '0';
+                overlay.style.visibility = 'hidden';
+                overlay.style.pointerEvents = 'none';
+            });
+        }
+    });
+    
+    console.log(`🎯 Initialized hover controls for ${containers.length} project containers`);
 }
 
 // Initialize logo display when DOM is ready

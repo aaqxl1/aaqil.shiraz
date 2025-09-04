@@ -843,25 +843,36 @@ section {
     to { transform: rotate(360deg); }
 }
 
-/* Project Overlay */
+/* Project Overlay - Fixed to not block logo visibility */
 .project-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    visibility: hidden;
+    transition: all 0.3s ease;
     backdrop-filter: blur(4px);
     border-radius: 12px;
+    z-index: 100;
+    pointer-events: none;
 }
 
 .project-logo-container:hover .project-overlay {
     opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Ensure logos are always visible and not blocked by overlay */
+.project-logo {
+    z-index: 10;
+    position: relative;
 }
 
 .project-link-overlay {
@@ -885,7 +896,7 @@ section {
     box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
 }
 
-/* Project Logo Mini - For All Projects Section */
+/* Project Logo Mini - For All Projects Section - FIXED LAYOUT */
 .project-logo-mini {
     width: 48px !important;
     height: 48px !important;
@@ -897,6 +908,58 @@ section {
     transition: all 0.3s ease !important;
     background: transparent !important;
     border: none !important;
+    /* Critical: Constrain all children to fit within bounds */
+    overflow: hidden !important;
+}
+
+/* Fix specific mini logo sizing constraints */
+.project-logo-mini .sales-icon,
+.project-logo-mini .ml-icon,
+.project-logo-mini .slack-icon,
+.project-logo-mini .nps-icon,
+.project-logo-mini .co2-icon {
+    width: 36px !important;
+    height: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+/* Constrain all nested elements within mini logos */
+.project-logo-mini * {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Fix specific layout issues for sales dashboard */
+.sales-logo .dashboard-grid {
+    width: 16px !important;
+    height: 16px !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+}
+
+.sales-logo .trend-line {
+    width: 18px !important;
+    height: 12px !important;
+    position: absolute !important;
+    bottom: 2px !important;
+    right: 2px !important;
+}
+
+/* Fix ML logo neural network layout */
+.ml-logo .neural-network {
+    width: 28px !important;
+    height: 20px !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
 }
 
 .project-card:hover .project-logo-mini {
