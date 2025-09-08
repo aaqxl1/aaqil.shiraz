@@ -1,0 +1,1357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Budget Report Dashboard - Synth by Aaqil Shiraz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,0,1;wght@100..700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    /* Brand Colors */
+    --brand-yellow: #FFE317;
+    --brand-green: #3BFF9D;
+    --brand-dark: #131C26;
+
+    /* Light Theme Palette */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F7F7F8;
+    --bg-tertiary: #EDEDF0;
+    
+    --text-primary: #131C26;
+    --text-secondary: #5B636E;
+    --text-tertiary: #88909B;
+    
+    --border-primary: #DCDFE4;
+    --border-secondary: #EAECEF;
+
+    --accent-primary: var(--brand-yellow);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(18, 28, 38, 0.05);
+    --shadow-md: 0 4px 8px -2px rgba(18, 28, 38, 0.1), 0 2px 4px -2px rgba(18, 28, 38, 0.06);
+    --shadow-lg: 0 12px 16px -4px rgba(18, 28, 38, 0.08), 0 4px 6px -2px rgba(18, 28, 38, 0.03);
+
+    /* Legacy variables for Budget Report compatibility */
+    --tb-border: var(--border-primary);
+  }
+
+  /* Loading Overlay */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Disclaimer Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(19, 28, 38, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 500px;
+    margin: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.3s ease;
+  }
+
+  .modal-overlay.show .modal-content {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-header {
+    margin-bottom: 20px;
+  }
+
+  .modal-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .modal-subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .modal-body {
+    margin-bottom: 24px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .modal-button {
+    background: linear-gradient(135deg, var(--brand-yellow) 0%, #fbbf24 100%);
+    color: var(--brand-dark);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .modal-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Branding Logo */
+  .synth-branding {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-secondary);
+    z-index: 100;
+    transition: all 0.3s ease;
+  }
+
+  .synth-branding:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .synth-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .synth-icon {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--brand-yellow) 0%, var(--brand-green) 100%);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-dark);
+    font-weight: 800;
+    font-size: 10px;
+  }
+
+  /* Dynamic Animations */
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Dynamic Card Effects */
+  .highlight-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+  }
+
+  .driver-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Table Row Hover Effects */
+  .hl-cell {
+    transition: all 0.2s ease;
+  }
+
+  tbody tr:hover .hl-cell {
+    background-color: rgba(255, 227, 23, 0.1) !important;
+    transform: scale(1.01);
+  }
+
+  /* Loading Animation Enhancement */
+  .loading-spinner {
+    animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Button Hover Enhancements */
+  .load-btn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .load-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .load-btn:hover::before {
+    left: 100%;
+  }
+
+  .load-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Pill Enhancement */
+  .pill {
+    transition: all 0.2s ease;
+  }
+
+  .pill:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Staggered Animation Classes */
+  .animate-in {
+    animation: fadeInUp 0.6s ease forwards;
+  }
+
+  .animate-in-delayed {
+    animation: fadeInUp 0.6s ease 0.2s forwards;
+    opacity: 0;
+  }
+
+  .animate-slide-right {
+    animation: slideInRight 0.6s ease 0.4s forwards;
+    opacity: 0;
+  }
+
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--border-secondary);
+    border-radius: 50%;
+    border-top-color: var(--brand-yellow);
+    animation: spin 1s linear infinite;
+    position: relative;
+  }
+
+  .loading-spinner::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 3px solid transparent;
+    border-top-color: var(--brand-dark);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: spin 1.5s linear infinite reverse;
+  }
+
+  .loading-text {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    color: var(--text-primary);
+    line-height: 1.5;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  /* Typography */
+  .text-h1, .text-h2, .text-h3, .text-h4 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .text-h1 { font-size: 32px; margin-bottom: 1rem; }
+  .text-h2 { font-size: 24px; margin-bottom: 0.75rem; }
+  .text-h3 { font-size: 20px; margin-bottom: 0.5rem; }
+  .text-h4 { font-size: 16px; margin-bottom: 0.5rem; }
+  .text-body { font-size: 14px; color: var(--text-secondary); }
+  .text-small { font-size: 12px; color: var(--text-tertiary); }
+  .text-mono { font-family: 'Roboto Mono', monospace; }
+  .text-lead { font-size: 18px; font-weight: 400; line-height: 1.6; color: var(--text-primary); margin: 0; }
+
+  /* Budget Report specific table styles */
+  .tb { border: 1px solid var(--tb-border); }
+  tbody tr:nth-child(odd) td:not(.grand) { background: #f9fafb; }
+
+  /* highlight grid cells */
+  .hl-cell { padding: .25rem .75rem; white-space: nowrap; }
+  .hl-gap { padding-left: 2.25rem !important; }
+
+  /* Button styles - merged from both projects */
+  .btn {
+    font-family: 'Inter', sans-serif;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    line-height: 1.4;
+  }
+
+  .btn:active {
+    transform: scale(0.99);
+    filter: brightness(0.95);
+  }
+
+  .btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-primary-dark {
+    background-color: var(--brand-dark);
+    color: #FFFFFF;
+  }
+
+  .btn-primary-dark:hover {
+    background-color: #2a343f;
+  }
+
+  .btn-secondary-dark {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+  }
+
+  .btn-secondary-dark:hover {
+    border-color: #C6C8CC;
+    background-color: #E6E7EA;
+  }
+
+  .btn-outlined-dark {
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-primary);
+  }
+
+  .btn-outlined-dark:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+  }
+
+  /* Budget Report specific pill styles */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: 0 1.1rem;
+    height: 2.3rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    color: #fff;
+    line-height: 1;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.15s ease;
+  }
+
+  .pill svg {
+    width: 1rem;
+    height: 1rem;
+    margin-right: -.25rem;
+    opacity: .85;
+    transition: transform .2s;
+  }
+
+  .pill[aria-expanded=true] svg {
+    transform: rotate(-180deg);
+  }
+
+  .pill-indigo {
+    background: var(--brand-dark);
+  }
+
+  .pill-indigo:hover {
+    background: #2a343f;
+  }
+
+  .pill-violet {
+    background: #7c3aed;
+  }
+
+  .pill-violet:hover {
+    background: #6d28d9;
+  }
+
+  /* Menu styles */
+  .menu {
+    position: absolute;
+    z-index: 40;
+    top: calc(100% + .5rem);
+    left: 0;
+    width: 16rem;
+    max-height: 18rem;
+    overflow-y: auto;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-secondary);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-lg);
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity .18s, transform .18s;
+  }
+
+  .menu.open {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+
+  .menu-label {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .8rem 1.25rem;
+    font-size: .875rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .menu-label:hover {
+    background: var(--bg-tertiary);
+  }
+
+  /* Load button styles */
+  .load-btn {
+    height: 2.3rem;
+    padding: 0 1.4rem;
+    border-radius: 9999px;
+    background: var(--brand-dark);
+    color: #fff;
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .load-btn:hover {
+    background: #2a343f;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+
+
+  /* Table styles - enhanced from Herman's base */
+  .table-container {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    border: 1px solid var(--border-secondary);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .table th,
+  .table td {
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-secondary);
+  }
+
+  .table th {
+    background-color: var(--bg-secondary);
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: none;
+    font-size: 12px;
+    letter-spacing: 0;
+  }
+
+  .table td {
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+
+  .table tr:hover {
+    background-color: #F9FAFB;
+  }
+
+  .table tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Form Elements */
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  input[type="date"]:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--brand-dark);
+    box-shadow: 0 0 0 3px rgba(19, 28, 38, 0.1);
+  }
+
+  /* Cards */
+  .demo-card {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    border: 1px solid var(--border-secondary);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .demo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .card-header, .card-body, .card-footer {
+    padding: 16px 20px;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-secondary);
+  }
+  
+  .card-header h4 {
+    margin-bottom: 0;
+  }
+
+  .card-body {
+    flex-grow: 1;
+  }
+  
+  .card-footer {
+    border-top: 1px solid var(--border-secondary);
+    background-color: var(--bg-secondary);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    main {
+      padding: 16px !important;
+      width: 95% !important;
+    }
+    
+    /* Stack header content on mobile */
+    header {
+      flex-direction: column !important;
+      gap: 16px !important;
+    }
+    
+    header > div:last-child {
+      margin-left: 0 !important;
+      align-self: center;
+    }
+    
+    header img {
+      height: 30px !important;
+    }
+    
+    .table th,
+    .table td {
+      padding: 6px 8px;
+      font-size: 11px;
+      min-width: 80px !important;
+    }
+
+    .pill {
+      padding: 0 0.8rem;
+      height: 2rem;
+      font-size: 0.875rem;
+    }
+
+    .load-btn {
+      height: 2rem;
+      padding: 0 1rem;
+      font-size: 0.875rem;
+    }
+    
+    /* Stack highlights on mobile */
+    .highlights-container {
+      grid-template-columns: 1fr !important;
+      gap: 16px !important;
+    }
+
+    .driver-card {
+      min-width: auto !important;
+      width: 100% !important;
+    }
+
+    .highlight-card, .driver-card {
+      padding: 20px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .table th,
+    .table td {
+      padding: 6px 8px;
+      font-size: 11px;
+    }
+
+    .pill {
+      padding: 0 0.6rem;
+      height: 1.8rem;
+      font-size: 0.75rem;
+    }
+
+    .load-btn {
+      height: 1.8rem;
+      padding: 0 0.8rem;
+      font-size: 0.75rem;
+    }
+  }
+  </style>
+</head>
+<body>
+<!-- Disclaimer Modal -->
+<div class="modal-overlay" id="disclaimerModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">⚠️ Demo Dashboard</h2>
+      <p class="modal-subtitle">Important Notice</p>
+    </div>
+    <div class="modal-body">
+      <p><strong>This is a demonstration application with mock data.</strong></p>
+      <p>The financial figures, employee records, and budget allocations displayed here are entirely fictional and generated for portfolio demonstration purposes only.</p>
+      <p>This dashboard showcases data visualization, real-time updates, and modern web application design patterns.</p>
+    </div>
+    <button class="modal-button" onclick="closeDisclaimer()">
+      Got it, continue to dashboard →
+    </button>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Loading...</p>
+  </div>
+</div>
+
+<!-- Synth Branding -->
+<div class="synth-branding">
+  <a href="#" class="synth-logo" onclick="showCredits()">
+    <div class="synth-icon">S</div>
+    <span>Synth Coded by Aaqil Shiraz</span>
+  </a>
+</div>
+
+<main style="padding: 24px 32px; width: 100%; margin: 0;">
+  <header style="margin-bottom: 40px; padding: 32px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%); backdrop-filter: blur(20px); border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-secondary); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, var(--brand-yellow) 0%, var(--brand-green) 100%); opacity: 0.03; pointer-events: none;"></div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; position: relative;">
+      <div>
+        <h1 class="text-h1" style="margin-bottom: 8px;">Budget Report H1 2025</h1>
+        <p class="text-body" style="opacity: 0.7; margin: 0;">Real-time financial insights and workforce analytics</p>
+      </div>
+      <div style="text-align: right;">
+        <div class="text-small" style="opacity: 0.6; margin-bottom: 4px;">Last Updated</div>
+        <div class="text-mono" style="font-weight: 500;" id="lastUpdated">Loading...</div>
+      </div>
+    </div>
+  </header>
+
+  <!--  HIGHLIGHTS + DRIVERS  -->
+  <div id="highlights" class="animate-in" style="margin-bottom: 48px;"></div>
+
+  <!--  DIVISION SUMMARY  -->
+  <div class="animate-in-delayed" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 250, 252, 0.8) 100%); backdrop-filter: blur(10px); border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid var(--border-secondary); box-shadow: var(--shadow-sm);">
+    <h2 class="text-h2" style="margin: 0; display: flex; align-items: center; gap: 12px;">
+      <span style="width: 4px; height: 24px; background: linear-gradient(135deg, var(--brand-yellow) 0%, var(--brand-green) 100%); border-radius: 2px;"></span>
+      Division Summary
+    </h2>
+  </div>
+  <section style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 24px; margin-top: 16px;">
+    <div id="locWrapDiv" class="relative">
+      <button id="locBtnDiv" class="pill pill-indigo" aria-expanded="false">
+        <span id="locLabelDiv" data-kind="locations">all locations</span>
+        <svg viewBox="0 0 24 24" stroke="currentColor" fill="none"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div id="locMenuDiv" class="menu"></div>
+    </div>
+    <div id="monWrapDiv" class="relative">
+      <button id="monBtnDiv" class="pill pill-violet" aria-expanded="false">
+        <span id="monLabelDiv" data-kind="months">Year to Date</span>
+        <svg viewBox="0 0 24 24" stroke="currentColor" fill="none"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div id="monMenuDiv" class="menu w-60"></div>
+    </div>
+    <button id="loadBtnDiv" class="load-btn">load table</button>
+  </section>
+  <div id="divTableWrap" class="table-container" style="margin-bottom: 48px; overflow-x: auto; width: 100%; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 12px; padding: 16px; border: 1px solid var(--border-secondary); box-shadow: var(--shadow-md);"></div>
+
+  <!--  ROLES  -->
+  <div class="animate-slide-right" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 250, 252, 0.8) 100%); backdrop-filter: blur(10px); border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid var(--border-secondary); box-shadow: var(--shadow-sm);">
+    <h2 class="text-h2" style="margin: 0; display: flex; align-items: center; gap: 12px;">
+      <span style="width: 4px; height: 24px; background: linear-gradient(135deg, var(--brand-yellow) 0%, var(--brand-green) 100%); border-radius: 2px;"></span>
+      Roles
+    </h2>
+  </div>
+  <section style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 24px; margin-top: 16px;">
+    <div id="divWrapRoles" class="relative">
+      <button id="divBtnRoles" class="pill pill-indigo" aria-expanded="false">
+        <span id="divLabelRoles" data-kind="divisions">all divisions</span>
+        <svg viewBox="0 0 24 24" stroke="currentColor" fill="none"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div id="divMenuRoles" class="menu"></div>
+    </div>
+    <div id="locWrapRoles" class="relative">
+      <button id="locBtnRoles" class="pill pill-indigo" aria-expanded="false">
+        <span id="locLabelRoles" data-kind="locations">all locations</span>
+        <svg viewBox="0 0 24 24" stroke="currentColor" fill="none"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div id="locMenuRoles" class="menu"></div>
+    </div>
+    <div id="catWrapRoles" class="relative">
+      <button id="catBtnRoles" class="pill pill-indigo" aria-expanded="false">
+        <span id="catLabelRoles" data-kind="categories">all categories</span>
+        <svg viewBox="0 0 24 24" stroke="currentColor" fill="none"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div id="catMenuRoles" class="menu"></div>
+    </div>
+    <button id="loadBtnRoles" class="load-btn">load table</button>
+  </section>
+  <div id="rolesTableWrap" class="table-container" style="overflow-x: auto; width: 100%; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 12px; padding: 16px; border: 1px solid var(--border-secondary); box-shadow: var(--shadow-md);"></div>
+</main>
+
+<!-- ---------------  J S  --------------- -->
+<script>
+/* ===== injected server data ===== */
+const initialDataDiv   = <?!= initialDataDiv ?>;
+const initialDataRoles = <?!= initialDataRoles ?>;
+const initialHL        = <?!= initialHL ?>;
+const divisions        = <?!= divisionsJSON ?>;
+const locations        = <?!= locationsJSON ?>;
+const categories       = <?!= categoriesJSON ?>;
+const months           = <?!= monthsJSON ?>;   // [{v:"2025-06",l:"June 2025"},...]
+const BAR              = <?!= barsJSON ?>;
+const CELL             = <?!= cellsJSON ?>;
+const SPAN             = <?!= spansJSON ?>;
+
+/* ===== helper funcs ===== */
+const fmtNum = n => Math.round(n).toLocaleString();
+const fmtUsd = n => '$' + fmtNum(n);
+const pct1   = (n,t) => t ? (Math.round(n/t*1000)/10).toFixed(1)+'%' : '—';
+
+/* ===== loading overlay functions ===== */
+function showLoading() {
+  document.getElementById('loading-overlay').classList.add('active');
+}
+
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.remove('active');
+}
+
+/* ===== disclaimer modal functions ===== */
+function showDisclaimer() {
+  const modal = document.getElementById('disclaimerModal');
+  modal.classList.add('show');
+}
+
+function closeDisclaimer() {
+  const modal = document.getElementById('disclaimerModal');
+  modal.classList.remove('show');
+  localStorage.setItem('budgetReportDisclaimerSeen', 'true');
+}
+
+function showCredits() {
+  alert('🚀 Synth Dashboard\n\nBuilt by Aaqil Shiraz\nModern web application showcasing:\n• Real-time data visualization\n• Responsive design patterns\n• Interactive dashboards\n• Google Apps Script integration');
+}
+
+/* ===== initialization ===== */
+function initializeApp() {
+  // Show disclaimer on first visit
+  const disclaimerSeen = localStorage.getItem('budgetReportDisclaimerSeen');
+  if (!disclaimerSeen) {
+    setTimeout(() => showDisclaimer(), 500);
+  }
+  
+  // Set last updated timestamp
+  const now = new Date();
+  const lastUpdatedEl = document.getElementById('lastUpdated');
+  if (lastUpdatedEl) {
+    lastUpdatedEl.textContent = now.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  // Add dynamic hover effects to tables
+  setTimeout(() => {
+    addTableHoverEffects();
+    addProgressiveLoading();
+  }, 1000);
+}
+
+/* ===== dynamic table effects ===== */
+function addTableHoverEffects() {
+  // Add hover effects to all table rows
+  const tables = document.querySelectorAll('table');
+  tables.forEach(table => {
+    const rows = table.querySelectorAll('tbody tr');
+    rows.forEach((row, index) => {
+      row.style.transition = 'all 0.2s ease';
+      row.addEventListener('mouseenter', () => {
+        row.style.transform = 'scale(1.01)';
+        row.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+        row.style.zIndex = '10';
+        row.style.position = 'relative';
+      });
+      row.addEventListener('mouseleave', () => {
+        row.style.transform = 'scale(1)';
+        row.style.boxShadow = 'none';
+        row.style.zIndex = '1';
+      });
+    });
+  });
+}
+
+/* ===== progressive loading animation ===== */
+function addProgressiveLoading() {
+  const cards = document.querySelectorAll('.table-container, .highlight-card, .driver-card');
+  cards.forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'all 0.6s ease';
+    
+    setTimeout(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, index * 150 + 200);
+  });
+}
+
+/* ===== enhanced loading states ===== */
+function showLoadingWithPulse() {
+  showLoading();
+  const loadingText = document.querySelector('.loading-text');
+  if (loadingText) {
+    let dots = 0;
+    const interval = setInterval(() => {
+      dots = (dots + 1) % 4;
+      loadingText.textContent = 'Loading' + '.'.repeat(dots);
+    }, 500);
+    
+    // Store interval to clear it later
+    window.loadingInterval = interval;
+  }
+}
+
+function hideLoadingWithDelay() {
+  if (window.loadingInterval) {
+    clearInterval(window.loadingInterval);
+  }
+  setTimeout(() => {
+    hideLoading();
+    addProgressiveLoading();
+  }, 300);
+}
+
+function toggleMenu(btn,menu){
+  const open=menu.classList.toggle('open');
+  btn.setAttribute('aria-expanded',open);
+}
+function buildCheckbox(menu,label,items){
+  items.forEach(txt=>{
+    const row=document.createElement('label');
+    row.className='menu-label';
+    const cb=document.createElement('input');
+    cb.type='checkbox';
+    cb.value=txt;
+    row.append(cb,document.createTextNode(txt));
+    menu.appendChild(row);
+  });
+  const refresh=()=>{
+    const list=[...menu.querySelectorAll('input:checked')].map(c=>c.value);
+    label.textContent=list.length?list.join(', '):'all '+label.dataset.kind;
+  };
+  menu.addEventListener('change',refresh);
+  refresh();
+}
+function buildCheckboxMenu(btn,menu,label,items){
+  buildCheckbox(menu,label,items);
+  btn.onclick=()=>toggleMenu(btn,menu);
+  window.addEventListener('click',e=>{
+    if(!e.target.closest(btn.parentNode)){
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded','false');
+    }
+  });
+}
+
+/* ===== NEW: month picker that uses the ISO codes as the value, but shows human labels ===== */
+function buildMonthPicker(btn, menu, label, items) {
+  items.forEach(item => {
+    const row = document.createElement('label');
+    row.className = 'menu-label';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = item.v;            // the ISO sheet name
+    row.append(cb, document.createTextNode(item.l));
+    menu.appendChild(row);
+  });
+  const refresh = () => {
+    const checked = [...menu.querySelectorAll('input:checked')];
+    if (checked.length) {
+      // label shows their human labels:
+      label.textContent = checked.map(c=>c.parentNode.textContent).join(', ');
+    } else {
+      label.textContent = 'Year to Date';
+    }
+  };
+  menu.addEventListener('change',refresh);
+  btn.onclick = () => toggleMenu(btn,menu);
+  window.addEventListener('click',e=>{
+    if(!e.target.closest(btn.parentNode)){
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded','false');
+    }
+  });
+  refresh();
+}
+
+/* ===== renderHighlights (left) + driver table (right) ===== */
+function renderHighlights(h){
+  const b=h.budget, r=h.recruit, d=h.dev, u=h.uw, oc=h.offCycle, riskOffHC=h.riskOffHC;
+
+  /* dev cell helper */
+  const devCell=v=>{
+    const col=v<0?'#16a34a':v>0?'#dc2626':'inherit';
+    return `<td class="hl-cell text-center font-medium" style="color:${col}">${v===0?'$0':(v<0?'-':'')+fmtUsd(Math.abs(v))}</td>`;
+  };
+
+  /* highlight table row */
+  const row=(lbl,rls,cst,hrs,rcst,pH,pC,dev,bold=false)=>`
+    <tr class="${bold?'font-bold':''}">
+      <td class="hl-cell text-left">${lbl}</td>
+      <td class="hl-cell text-center">${rls!==''?fmtNum(rls):'—'}</td>
+      <td class="hl-cell text-center">${cst!==''?fmtUsd(cst):'—'}</td>
+      <td class="hl-cell text-center hl-gap">${hrs!==''?fmtNum(hrs):'—'}</td>
+      <td class="hl-cell text-center">${rcst!==''?fmtUsd(rcst):'—'}</td>
+      <td class="hl-cell text-center hl-gap">${pH!==''?pct1(...pH):'—'}</td>
+      <td class="hl-cell text-center">${pC!==''?pct1(...pC):'—'}</td>
+      ${dev}
+    </tr>`;
+
+  /* left pane – highlight table + bullets */
+  const highlightTable=`
+    <table class="text-sm select-none" style="width: max-content; min-width: 980px;">
+      <thead class="font-semibold text-slate-800">
+        <tr>
+          <th></th>
+          <th colspan="2" class="hl-cell text-center">Budget Movement</th>
+          <th colspan="2" class="hl-cell text-center hl-gap">Recruitment Activity</th>
+          <th class="hl-cell text-center hl-gap">% Hired</th>
+          <th class="hl-cell text-center">Cost Spent YTD</th>
+          <th class="hl-cell text-center">Deviance</th>
+        </tr>
+        <tr>
+          <th></th>
+          <th class="hl-cell text-center">Roles</th>
+          <th class="hl-cell text-center">Cost</th>
+          <th class="hl-cell text-center hl-gap">Hires</th>
+          <th class="hl-cell text-center">Cost</th>
+          <th></th><th></th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${row('Planned',b.roles.plan,b.cost.plan,
+               r.hires.plan,r.cost.plan,
+               [r.hires.plan,b.roles.plan],
+               [r.cost.plan ,b.cost.plan ],
+               devCell(d.plan))}
+        ${row('Off-cycle',b.roles.off,b.cost.off,
+               r.hires.off ,r.cost.off ,
+               [r.hires.off ,b.roles.off ],
+               [r.cost.off  ,b.cost.off ],
+               devCell(d.off))}
+        ${row('Cancelled',b.roles.canc,b.cost.canc,'','', '','',devCell(0))}
+        ${row('TOTAL',b.roles.total,b.cost.total,
+               r.hires.total,r.cost.total,
+               [r.hires.total,b.roles.total],
+               [r.cost.total ,b.cost.total ],
+               devCell(d.total),true)}
+        <tr><td class="h-2" colspan="8"></td></tr>
+        ${row('Replacements','','',
+               r.hires.repl,r.cost.repl,
+               [r.hires.repl,b.roles.repl],
+               [r.cost.repl ,b.cost.repl ],
+               devCell(d.repl))}
+      </tbody>
+    </table>
+
+    <div class="mt-6 text-sm leading-6" style="width: 100%;">
+      <p class="font-semibold mb-2">Comment:</p>
+      <ul class="list-disc pl-6 space-y-1">
+        <li>Budget Utilization: ${fmtUsd(r.cost.total)} out of ${fmtUsd(b.cost.total)} (${pct1(r.cost.total,b.cost.total)})</li>
+        <li>${pct1(b.roles.off ,b.roles.plan+b.roles.off)} of the additional new are off-cycle</li>
+        <li>${((r.hires.repl / (r.hires.total + r.hires.repl)) * 100).toFixed(1)}% of total hired plan are replacements</li>
+      </ul>
+      
+      
+    </div>`;
+
+  /* right pane – driver table */
+  const driverRows=oc.drivers.map(o=>`
+    <tr>
+      <td class="hl-cell text-left">${o.Division}</td>
+      <td class="hl-cell text-center">${fmtNum(o.hc)}</td>
+      <td class="hl-cell text-center">${pct1(o.hc,oc.totalOffHC)}</td>
+      <td class="hl-cell text-center">${fmtUsd(o.cost)}</td>
+      <td class="hl-cell text-center">${pct1(o.cost,oc.totalOffCost)}</td>
+    </tr>`).join('');
+
+  const driverTable=`
+    <h3 class="font-semibold mb-3 text-base">Top 3 Drivers of the Off-cycle Budget</h3>
+    <table class="text-sm select-none" style="width: 100%; white-space: nowrap;">
+      <thead class="font-semibold text-slate-800">
+        <tr>
+          <th class="hl-cell text-left">Division</th>
+          <th class="hl-cell text-center">Off-cycle addition</th>
+          <th class="hl-cell text-center">% of Off-cycle addition (${fmtNum(oc.totalOffHC)})</th>
+          <th class="hl-cell text-center">Added Cost</th>
+          <th class="hl-cell text-center">% of Off-cycle $ (${fmtUsd(oc.totalOffCost)})</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${driverRows}
+        <tr class="font-bold">
+          <td class="hl-cell text-left">TOTAL</td>
+          <td class="hl-cell text-center">${fmtNum(oc.totalDriversHC)}</td>
+          <td class="hl-cell text-center">${pct1(oc.totalDriversHC,oc.totalOffHC)}</td>
+          <td class="hl-cell text-center">${fmtUsd(oc.totalDriversCost)}</td>
+          <td class="hl-cell text-center">${pct1(oc.totalDriversCost,oc.totalOffCost)}</td>
+        </tr>
+      </tbody>
+    </table>`;
+
+  /* render both panes */
+  document.getElementById('highlights').innerHTML=`
+    <div class="highlights-container" style="display: grid; grid-template-columns: max-content 1fr; gap: 24px; align-items: stretch; justify-items: start; width: 100%;">
+      <div class="highlight-card" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border: 1px solid var(--border-secondary); border-radius: 16px; padding: 28px; box-shadow: var(--shadow-lg); transition: all 0.3s ease; position: relative; width: -moz-fit-content; width: fit-content;">
+        <div class="card-shimmer" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 227, 23, 0.1), transparent); animation: shimmer 3s infinite;"></div>
+        ${highlightTable}
+      </div>
+      <div class="driver-card" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border: 1px solid var(--border-secondary); border-radius: 16px; padding: 36px; box-shadow: var(--shadow-lg); transition: all 0.3s ease; width: 100%; min-width: 420px; height: 100%; overflow: hidden; position: relative;">
+        ${driverTable}
+      </div>
+    </div>`;
+}
+
+/* ===== big division table ===== */
+const ALWAYS_CURRENCY=new Set(['ADD NEW COST','COST','HIRED BUDGET','HIRED ACTUAL']);
+function renderTable(ds,firstKey,containerId){
+  const wrap=document.getElementById(containerId);wrap.innerHTML='';
+  if(!ds.rows.length){wrap.textContent='no data';return;}
+
+  /* tint palette for alternating blocks */
+  const tint=['transparent'];let gi=0;
+  SPAN.forEach(sp=>{for(let i=0;i<sp;i++)tint.push(CELL[gi%CELL.length]);gi++;});
+
+  const tbl=document.createElement('table');tbl.className='w-full text-xs whitespace-nowrap border-collapse';tbl.style.width='100%';tbl.style.minWidth='100%';
+
+  /* group bar */
+  let tr=tbl.createTHead().insertRow();tr.insertCell().className='tb bg-white px-3 py-2';
+  ds.groupLabels.forEach((g,i)=>{
+    const th=document.createElement('th');
+    th.colSpan=SPAN[i];th.textContent=g;
+    th.style.backgroundColor=BAR[i%BAR.length];
+    th.className='tb text-white font-medium px-3 py-2';
+    tr.appendChild(th);
+  });
+
+  /* column headers */
+  tr=tbl.tHead.insertRow();let g=-1,spLeft=0;
+  ds.headers.forEach((h,i)=>{
+    if(i>0){if(spLeft===0){g++;spLeft=ds.groupSpans[g];}spLeft--;}
+    const clean=h.replace(/__\d+$/,'').replace(/\s*\(\d+\)$/,'').trim();
+    const th=document.createElement('th');
+    th.textContent=clean;th.style.background=tint[i];
+    if(i===0)th.style.minWidth='200px';
+    else th.style.minWidth='100px';
+    th.style.padding='4px 6px';
+    th.className='tb font-semibold';
+    tr.appendChild(th);
+  });
+
+  /* body rows */
+  const tbody=tbl.createTBody();
+  ds.rows.forEach(r=>{
+    const grand=r[firstKey].toString().toUpperCase()==='GRAND TOTAL';
+    const tr=tbody.insertRow();
+
+    ds.headers.forEach((orig,i)=>{
+      const base=orig.replace(/__\d+$/,'').replace(/\s*\(\d+\)$/,'').trim();
+      const raw=r[orig];
+      let v=raw;
+      if(typeof v==='number'){
+        v=Math.round(v);
+        v=ALWAYS_CURRENCY.has(base)?'$'+v.toLocaleString():v.toLocaleString();
+      }
+      if(i===0)v=grand?'GRAND TOTAL':v;
+
+      const td=tr.insertCell();
+      td.textContent=v;
+      if(i===0)td.style.minWidth='200px';
+      else td.style.minWidth='100px';
+      td.style.padding='4px 6px';
+      td.style.backgroundColor=grand?'#a78bfa':tint[i];
+      td.className=`tb ${i===0?'text-left':'text-center'} ${grand?'text-xs font-bold':''}`;
+
+      /* diff colouring */
+      if(base==='DIFF'){
+        if(grand){
+          /* colour only DIFF (1) and DIFF (3) cells */
+          if(/\(1\)|\(3\)/.test(orig)){
+            td.style.backgroundColor = raw>0 ? '#16a34a'
+                                  : raw<0 ? '#dc2626' : '#64748b';
+            td.style.color='#ffffff';
+          }
+        } else {
+          td.style.color=raw>0?'#16a34a':raw<0?'#dc2626':'inherit';
+        }
+      }
+    });
+  });
+
+  wrap.appendChild(tbl);
+}
+
+/* ===== roles table ===== */
+function renderRoles(ds,containerId){
+  const wrap=document.getElementById(containerId);wrap.innerHTML='';
+  if(!ds.rows.length){wrap.textContent='no data';return;}
+  const tbl=document.createElement('table');tbl.className='w-full text-xs whitespace-nowrap border-collapse';tbl.style.width='100%';tbl.style.minWidth='100%';
+  let tr=tbl.createTHead().insertRow();
+  ds.headers.forEach((h,i)=>{
+    const th=document.createElement('th');
+    th.textContent=h;th.style.backgroundColor=CELL[i%CELL.length];
+    if(i===0)th.style.minWidth='200px';
+    else th.style.minWidth='120px';
+    th.style.padding='4px 6px';
+    th.className='tb font-semibold';
+    tr.appendChild(th);
+  });
+  const tbody=tbl.createTBody();
+  ds.rows.forEach(r=>{
+    const tr=tbody.insertRow();
+    ds.headers.forEach((h,i)=>{
+      const td=tr.insertCell();
+      let v=r[h];
+      if(typeof v==='number')v=Math.round(v).toLocaleString();
+      td.textContent=v;
+      if(i===0)td.style.minWidth='200px';
+      else td.style.minWidth='120px';
+      td.style.padding='4px 6px';
+      td.className='tb text-center';
+      if(i===0)td.classList.add('text-left');
+    });
+  });
+  wrap.appendChild(tbl);
+}
+
+/* ===== load buttons ===== */
+document.getElementById('loadBtnDiv').onclick=()=>{
+  showLoadingWithPulse();
+  google.script.run.withSuccessHandler(ds=>{
+    renderTable(ds,'Division','divTableWrap');
+    hideLoadingWithDelay();
+    setTimeout(() => addTableHoverEffects(), 500);
+  }).getDivisionAggregatedData(getMonthDiv(),getLocsDiv());
+  google.script.run.withSuccessHandler(renderHighlights)
+                   .getHighlights(getLocsDiv());
+};
+document.getElementById('loadBtnRoles').onclick=()=>{
+  showLoadingWithPulse();
+  google.script.run.withSuccessHandler(ds=>{
+    renderRoles(ds,'rolesTableWrap');
+    hideLoadingWithDelay();
+    setTimeout(() => addTableHoverEffects(), 500);
+  }).getRolesData(getDivsRoles(),getLocsRoles(),getCatsRoles());
+};
+
+/* ===== helper getters ===== */
+function getMonthDiv (){
+  const sel=[...document.querySelectorAll('#monMenuDiv input:checked')].map(c=>c.value);
+  return sel[0]||'current';
+}
+function getLocsDiv (){return[...document.querySelectorAll('#locMenuDiv input:checked')].map(c=>c.value);}
+function getDivsRoles(){return[...document.querySelectorAll('#divMenuRoles input:checked')].map(c=>c.value);}
+function getLocsRoles(){return[...document.querySelectorAll('#locMenuRoles input:checked')].map(c=>c.value);}
+function getCatsRoles(){return[...document.querySelectorAll('#catMenuRoles input:checked')].map(c=>c.value);}
+
+/* ===== initial paint ===== */
+window.onload=()=>{
+  /* initialize app */
+  initializeApp();
+  
+  /* build menus */
+  buildCheckboxMenu(document.getElementById('locBtnDiv'), document.getElementById('locMenuDiv'),
+                    document.getElementById('locLabelDiv'), locations);
+  buildMonthPicker(document.getElementById('monBtnDiv'), document.getElementById('monMenuDiv'),
+                   document.getElementById('monLabelDiv'), months);
+  buildCheckboxMenu(document.getElementById('divBtnRoles'), document.getElementById('divMenuRoles'),
+                    document.getElementById('divLabelRoles'), divisions);
+  buildCheckboxMenu(document.getElementById('locBtnRoles'), document.getElementById('locMenuRoles'),
+                    document.getElementById('locLabelRoles'), locations);
+  buildCheckboxMenu(document.getElementById('catBtnRoles'), document.getElementById('catMenuRoles'),
+                    document.getElementById('catLabelRoles'), categories);
+
+  /* first render */
+  renderHighlights(initialHL);
+  renderTable(initialDataDiv,'Division','divTableWrap');
+  renderRoles(initialDataRoles,'rolesTableWrap');
+};
+</script>
+</body>
+</html>
