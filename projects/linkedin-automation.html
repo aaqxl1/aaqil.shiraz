@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkedIn InMail Automation – Project Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1220; --panel:#0f172a; --muted:#a1a1aa; --text:#f5f5f5; --accent:#B480FF; --accent2:#FFE317;
+      --br:14px; --border:#23232a;
+    }
+    *{ box-sizing:border-box; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    body{ margin:0; background:linear-gradient(135deg,#0b1220,#0a0f1d 60%,#0b1220); color:var(--text); }
+    .container{ max-width:1100px; margin:0 auto; padding:32px 20px 60px; }
+    .hero{ display:flex; gap:18px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .badge{ display:inline-grid; place-items:center; width:56px; height:56px; border-radius:12px; font-weight:800; color:#0f172a; background:linear-gradient(135deg,var(--accent2),#3BFF9D); box-shadow:0 10px 30px rgba(251,191,36,.25); }
+    h1{ margin:0; font-size:32px; font-weight:800; letter-spacing:.3px; }
+    .sub{ color:var(--muted); margin-top:6px; }
+    .panel{ background:rgba(15,23,42,.75); border:1px solid var(--border); border-radius:var(--br); padding:18px; box-shadow:0 16px 40px rgba(0,0,0,.35); }
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    @media (max-width:900px){ .grid{ grid-template-columns:1fr; } }
+    h2{ font-size:20px; margin:0 0 10px; font-weight:800; display:flex; align-items:center; gap:10px; }
+    h2:before{ content:''; width:6px; height:18px; border-radius:3px; background:linear-gradient(180deg,var(--accent2),#3BFF9D); }
+    .list{ margin:10px 0 0; padding-left:18px; color:var(--muted); }
+    .flow{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    .chip{ background:#111827; border:1px solid var(--border); color:#ddd; padding:8px 10px; border-radius:10px; display:flex; align-items:center; gap:8px; }
+    .arrow{ color:var(--muted); }
+    .btn{ background:linear-gradient(135deg,var(--accent2),#3BFF9D); color:#0f172a; border:0; padding:10px 14px; font-weight:800; border-radius:10px; cursor:pointer; }
+    table{ width:100%; border-collapse:collapse; }
+    th,td{ border:1px solid var(--border); padding:8px 10px; text-align:left; }
+    thead th{ background:#1f2937; }
+    .small{ font-size:12px; color:var(--muted); }
+    .code{ background:#0b1220; border:1px solid var(--border); border-radius:12px; padding:12px; overflow:auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; color:#cbd5e1; }
+    .spacer{ height:10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div style="display:flex; gap:14px; align-items:center;">
+        <div class="badge">AS</div>
+        <div>
+          <h1>LinkedIn InMail Automation</h1>
+          <div class="sub">Gmail → CSV parser → Google Sheets append (idempotent)</div>
+        </div>
+      </div>
+      <div>
+        <a class="btn" href="../index.html#featured">← Back to Portfolio</a>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="grid">
+      <div class="panel">
+        <h2>What it does</h2>
+        <ul class="list">
+          <li>Scans labeled Gmail messages for LinkedIn exports on schedule.</li>
+          <li>Validates and parses attached CSV(s); normalizes headers.</li>
+          <li>Appends clean rows to a Google Sheet with dedupe keys.</li>
+          <li>Logs every run with counts and error details.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h2>Flow</h2>
+        <div class="flow">
+          <div class="chip">Gmail label: <b>linkedIn/reports</b></div>
+          <div class="arrow">→</div>
+          <div class="chip">CSV attachment</div>
+          <div class="arrow">→</div>
+          <div class="chip">Parser + validation</div>
+          <div class="arrow">→</div>
+          <div class="chip">Transform</div>
+          <div class="arrow">→</div>
+          <div class="chip">Google Sheets append</div>
+        </div>
+        <p class="small" style="margin-top:10px;">Note: this page shows a safe, in-browser simulation only. No live Gmail/Sheets access.</p>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="panel">
+      <h2>Try a mock ingestion</h2>
+      <p class="small">Click run to parse a sample LinkedIn CSV and preview what would be appended.</p>
+      <div style="display:flex; gap:10px; margin:10px 0 14px;">
+        <button class="btn" id="runBtn">Run mock ingestion</button>
+        <span id="runStatus" class="small"></span>
+      </div>
+      <div id="tableWrap"></div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="grid">
+      <div class="panel">
+        <h2>Example execution log</h2>
+        <pre id="logBox" class="code"></pre>
+      </div>
+      <div class="panel">
+        <h2>Edge cases handled</h2>
+        <ul class="list">
+          <li>Missing attachment or wrong file type</li>
+          <li>Malformed CSV rows / unexpected headers</li>
+          <li>Duplicate rows (hash-based dedupe on [email,date])</li>
+          <li>Partial failures reported with actionable messages</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sampleCsv = `full_name,email,company,job_title,report_date\n`
+      + `Jane Doe,jane@example.com,Acme Corp,Data Analyst,2025-08-01\n`
+      + `John Smith,john@sample.io,Globex,Product Manager,2025-08-01\n`
+      + `Jane Doe,jane@example.com,Acme Corp,Data Analyst,2025-08-01`;
+
+    function parseCsv(text){
+      const lines = text.trim().split(/\r?\n/);
+      const headers = lines.shift().split(',').map(h=>h.trim());
+      const rows = lines.map(l=>{
+        const cols = l.split(',');
+        const o = {}; headers.forEach((h,i)=> o[h] = (cols[i]||'').trim());
+        return o;
+      });
+      return { headers, rows };
+    }
+
+    function renderTable(data){
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const htr = document.createElement('tr');
+      data.headers.forEach(h=>{ const th=document.createElement('th'); th.textContent=h; htr.appendChild(th); });
+      thead.appendChild(htr);
+      table.appendChild(thead);
+      const tbody=document.createElement('tbody');
+      data.rows.forEach(r=>{
+        const tr=document.createElement('tr');
+        data.headers.forEach(h=>{ const td=document.createElement('td'); td.textContent=r[h]; tr.appendChild(td); });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      const wrap=document.getElementById('tableWrap');
+      wrap.innerHTML='';
+      wrap.appendChild(table);
+    }
+
+    function simulateLog(rowsAppended){
+      const log = {
+        time: new Date().toISOString(),
+        label: 'linkedIn/reports',
+        attachmentsFound: 1,
+        parsedRows: rowsAppended,
+        appendedRows: rowsAppended,
+        deduped: 1,
+        status: 'success'
+      };
+      document.getElementById('logBox').textContent = JSON.stringify(log, null, 2);
+    }
+
+    document.getElementById('runBtn').addEventListener('click', ()=>{
+      const s = document.getElementById('runStatus');
+      s.textContent = 'Parsing CSV…';
+      setTimeout(()=>{
+        const data = parseCsv(sampleCsv);
+        renderTable(data);
+        simulateLog(data.rows.length);
+        s.textContent = 'Completed mock run.';
+      }, 200);
+    });
+  </script>
+</body>
+</html>
