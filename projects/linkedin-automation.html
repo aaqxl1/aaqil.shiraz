@@ -6,10 +6,7 @@
   <title>LinkedIn InMail Automation – Project Overview</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#0b1220; --panel:#0f172a; --muted:#a1a1aa; --text:#f5f5f5; --accent:#B480FF; --accent2:#FFE317;
-      --br:14px; --border:#23232a;
-    }
+    :root{ --bg:#0b1220; --panel:#0f172a; --muted:#a1a1aa; --text:#f5f5f5; --accent:#B480FF; --accent2:#FFE317; --good:#22c55e; --warn:#fbbf24; --br:14px; --border:#23232a; }
     *{ box-sizing:border-box; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
     body{ margin:0; background:linear-gradient(135deg,#0b1220,#0a0f1d 60%,#0b1220); color:var(--text); }
     .container{ max-width:1100px; margin:0 auto; padding:32px 20px 60px; }
@@ -27,12 +24,23 @@
     .chip{ background:#111827; border:1px solid var(--border); color:#ddd; padding:8px 10px; border-radius:10px; display:flex; align-items:center; gap:8px; }
     .arrow{ color:var(--muted); }
     .btn{ background:linear-gradient(135deg,var(--accent2),#3BFF9D); color:#0f172a; border:0; padding:10px 14px; font-weight:800; border-radius:10px; cursor:pointer; }
+    .tabs{ display:flex; gap:8px; margin:20px 0 14px; flex-wrap:wrap; }
+    .tab{ border:1px solid var(--border); background:#111827; color:#e5e7eb; padding:8px 12px; border-radius:10px; cursor:pointer; }
+    .tab.active{ background:linear-gradient(135deg,rgba(180,128,255,.2),rgba(59,255,157,.1)); color:#fff; }
+    .tabpanel{ display:none; animation: fade .25s ease; }
+    .tabpanel.active{ display:block; }
+    @keyframes fade{ from{ opacity:.4; transform: translateY(8px);} to{ opacity:1; transform:none; } }
     table{ width:100%; border-collapse:collapse; }
     th,td{ border:1px solid var(--border); padding:8px 10px; text-align:left; }
     thead th{ background:#1f2937; }
     .small{ font-size:12px; color:var(--muted); }
     .code{ background:#0b1220; border:1px solid var(--border); border-radius:12px; padding:12px; overflow:auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; color:#cbd5e1; }
     .spacer{ height:10px; }
+    .steps{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+    .step{ display:flex; gap:8px; align-items:center; padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:#0f172a; color:#e5e7eb; }
+    .step.done{ border-color:#14532d; background:rgba(20,83,45,.3); }
+    .drop{ border:2px dashed #334155; border-radius:12px; padding:16px; text-align:center; color:#94a3b8; }
+    .drop.drag{ background:rgba(180,128,255,.09); border-color:#B480FF; color:#e5e7eb; }
   </style>
 </head>
 <body>
@@ -50,77 +58,96 @@
       </div>
     </div>
 
-    <div class="spacer"></div>
-    <div class="grid">
-      <div class="panel">
-        <h2>What it does</h2>
-        <ul class="list">
-          <li>Scans labeled Gmail messages for LinkedIn exports on schedule.</li>
-          <li>Validates and parses attached CSV(s); normalizes headers.</li>
-          <li>Appends clean rows to a Google Sheet with dedupe keys.</li>
-          <li>Logs every run with counts and error details.</li>
-        </ul>
-      </div>
-      <div class="panel">
-        <h2>Flow</h2>
-        <div class="flow">
-          <div class="chip">Gmail label: <b>linkedIn/reports</b></div>
-          <div class="arrow">→</div>
-          <div class="chip">CSV attachment</div>
-          <div class="arrow">→</div>
-          <div class="chip">Parser + validation</div>
-          <div class="arrow">→</div>
-          <div class="chip">Transform</div>
-          <div class="arrow">→</div>
-          <div class="chip">Google Sheets append</div>
+    <div class="tabs">
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="demo">Demo</button>
+      <button class="tab" data-tab="logs">Logs & Errors</button>
+    </div>
+
+    <section id="overview" class="tabpanel active">
+      <div class="grid">
+        <div class="panel">
+          <h2>What it does</h2>
+          <ul class="list">
+            <li>Scans labeled Gmail messages for LinkedIn exports on schedule.</li>
+            <li>Validates and parses attached CSV(s); normalizes headers.</li>
+            <li>Appends clean rows to a Google Sheet with dedupe keys.</li>
+            <li>Logs every run with counts and error details.</li>
+          </ul>
         </div>
-        <p class="small" style="margin-top:10px;">Note: this page shows a safe, in-browser simulation only. No live Gmail/Sheets access.</p>
+        <div class="panel">
+          <h2>Flow</h2>
+          <div class="flow">
+            <div class="chip">Gmail label: <b>linkedIn/reports</b></div>
+            <div class="arrow">→</div>
+            <div class="chip">CSV attachment</div>
+            <div class="arrow">→</div>
+            <div class="chip">Parser + validation</div>
+            <div class="arrow">→</div>
+            <div class="chip">Transform</div>
+            <div class="arrow">→</div>
+            <div class="chip">Google Sheets append</div>
+          </div>
+          <p class="small" style="margin-top:10px;">This page shows a safe, in-browser simulation only. No live Gmail/Sheets access.</p>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="spacer"></div>
-    <div class="panel">
-      <h2>Try a mock ingestion</h2>
-      <p class="small">Click run to parse a sample LinkedIn CSV and preview what would be appended.</p>
-      <div style="display:flex; gap:10px; margin:10px 0 14px;">
-        <button class="btn" id="runBtn">Run mock ingestion</button>
-        <span id="runStatus" class="small"></span>
+    <section id="demo" class="tabpanel">
+      <div class="panel">
+        <h2>Try a mock ingestion</h2>
+        <div class="steps">
+          <div id="stp1" class="step">1. Upload sample CSV</div>
+          <div id="stp2" class="step">2. Parse & validate</div>
+          <div id="stp3" class="step">3. Preview append</div>
+        </div>
+        <div id="drop" class="drop">Drag & drop CSV here or <button class="btn" id="runBtn">Use built-in sample</button></div>
+        <div id="runStatus" class="small" style="margin-top:10px;"></div>
+        <div id="tableWrap" style="margin-top:12px;"></div>
       </div>
-      <div id="tableWrap"></div>
-    </div>
+    </section>
 
-    <div class="spacer"></div>
-    <div class="grid">
-      <div class="panel">
-        <h2>Example execution log</h2>
-        <pre id="logBox" class="code"></pre>
+    <section id="logs" class="tabpanel">
+      <div class="grid">
+        <div class="panel">
+          <h2>Example execution log</h2>
+          <pre id="logBox" class="code"></pre>
+        </div>
+        <div class="panel">
+          <h2>Edge cases handled</h2>
+          <ul class="list">
+            <li>Missing attachment or wrong file type</li>
+            <li>Malformed CSV rows / unexpected headers</li>
+            <li>Duplicate rows (hash-based dedupe on [email,date])</li>
+            <li>Partial failures reported with actionable messages</li>
+          </ul>
+        </div>
       </div>
-      <div class="panel">
-        <h2>Edge cases handled</h2>
-        <ul class="list">
-          <li>Missing attachment or wrong file type</li>
-          <li>Malformed CSV rows / unexpected headers</li>
-          <li>Duplicate rows (hash-based dedupe on [email,date])</li>
-          <li>Partial failures reported with actionable messages</li>
-        </ul>
-      </div>
-    </div>
+    </section>
   </div>
 
   <script>
+    // tab logic
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.tabpanel');
+    tabs.forEach(t=> t.addEventListener('click', ()=>{
+      tabs.forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      panels.forEach(p=> p.classList.toggle('active', p.id===t.dataset.tab));
+    }));
+
+    // sample CSV
     const sampleCsv = `full_name,email,company,job_title,report_date\n`
       + `Jane Doe,jane@example.com,Acme Corp,Data Analyst,2025-08-01\n`
       + `John Smith,john@sample.io,Globex,Product Manager,2025-08-01\n`
       + `Jane Doe,jane@example.com,Acme Corp,Data Analyst,2025-08-01`;
 
+    function mark(stepId){ document.getElementById(stepId).classList.add('done'); }
+
     function parseCsv(text){
       const lines = text.trim().split(/\r?\n/);
       const headers = lines.shift().split(',').map(h=>h.trim());
-      const rows = lines.map(l=>{
-        const cols = l.split(',');
-        const o = {}; headers.forEach((h,i)=> o[h] = (cols[i]||'').trim());
-        return o;
-      });
+      const rows = lines.map(l=>{ const cols=l.split(','); const o={}; headers.forEach((h,i)=> o[h]=(cols[i]||'').trim()); return o; });
       return { headers, rows };
     }
 
@@ -129,42 +156,34 @@
       const thead = document.createElement('thead');
       const htr = document.createElement('tr');
       data.headers.forEach(h=>{ const th=document.createElement('th'); th.textContent=h; htr.appendChild(th); });
-      thead.appendChild(htr);
-      table.appendChild(thead);
+      thead.appendChild(htr); table.appendChild(thead);
       const tbody=document.createElement('tbody');
-      data.rows.forEach(r=>{
-        const tr=document.createElement('tr');
-        data.headers.forEach(h=>{ const td=document.createElement('td'); td.textContent=r[h]; tr.appendChild(td); });
-        tbody.appendChild(tr);
-      });
+      data.rows.forEach(r=>{ const tr=document.createElement('tr'); data.headers.forEach(h=>{ const td=document.createElement('td'); td.textContent=r[h]; tr.appendChild(td); }); tbody.appendChild(tr); });
       table.appendChild(tbody);
-      const wrap=document.getElementById('tableWrap');
-      wrap.innerHTML='';
-      wrap.appendChild(table);
+      const wrap=document.getElementById('tableWrap'); wrap.innerHTML=''; wrap.appendChild(table);
     }
 
     function simulateLog(rowsAppended){
-      const log = {
-        time: new Date().toISOString(),
-        label: 'linkedIn/reports',
-        attachmentsFound: 1,
-        parsedRows: rowsAppended,
-        appendedRows: rowsAppended,
-        deduped: 1,
-        status: 'success'
-      };
+      const log = { time:new Date().toISOString(), label:'linkedIn/reports', attachmentsFound:1, parsedRows:rowsAppended, appendedRows:rowsAppended, deduped:1, status:'success' };
       document.getElementById('logBox').textContent = JSON.stringify(log, null, 2);
     }
 
-    document.getElementById('runBtn').addEventListener('click', ()=>{
-      const s = document.getElementById('runStatus');
-      s.textContent = 'Parsing CSV…';
-      setTimeout(()=>{
-        const data = parseCsv(sampleCsv);
-        renderTable(data);
-        simulateLog(data.rows.length);
-        s.textContent = 'Completed mock run.';
-      }, 200);
+    function runWithCsv(text){
+      const s = document.getElementById('runStatus'); s.textContent='Parsing CSV…';
+      setTimeout(()=>{ mark('stp2'); const data=parseCsv(text); renderTable(data); mark('stp3'); simulateLog(data.rows.length); s.textContent='Completed mock run.'; }, 250);
+    }
+
+    // built-in sample
+    document.getElementById('runBtn').addEventListener('click', ()=>{ mark('stp1'); runWithCsv(sampleCsv); });
+
+    // drag & drop CSV
+    const drop = document.getElementById('drop');
+    ;['dragenter','dragover'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('drag'); }));
+    ;['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('drag'); }));
+    drop.addEventListener('drop', e=>{
+      const file = e.dataTransfer.files[0]; if(!file) return;
+      if(!/\.csv$/i.test(file.name)){ document.getElementById('runStatus').textContent='Please drop a .csv file.'; return; }
+      mark('stp1'); const reader=new FileReader(); reader.onload=()=> runWithCsv(reader.result); reader.readAsText(file);
     });
   </script>
 </body>
